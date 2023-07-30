@@ -13,9 +13,12 @@ const imagesPicklist = [...imageUrls, ...imageUrls];
 const tileCount = imagesPicklist.length;
 
 // Game state
-let revealedCount = 0;
-let activeTile = null;
-let awaitingEndOfMove = false;
+const game = {
+  revealedCount: 0,
+  activeTile: null,
+  awaitingEndOfMove: false,
+  isComparing: false,
+};
 
 // Add effect for tile
 function addClickEffect(tile) {
@@ -39,60 +42,64 @@ function buildTile(imageUrl) {
 
   element.appendChild(image);
 
-  element.addEventListener("click", () => {
-    addClickEffect(element);
-    const revealed = element.getAttribute("data-revealed");
+  element.addEventListener("click", handleTileClick);
 
-    if (awaitingEndOfMove || revealed === "true" || element == activeTile) {
-      return;
-    }
+  return element;
+}
 
-    // Reveal this image
-    image.classList.remove("hidden");
+// Handle tile click
+function handleTileClick(event) {
+  const element = event.target.closest(".tile");
 
-    if (!activeTile) {
-      activeTile = element;
+  if (!element || game.awaitingEndOfMove || game.isComparing || element.getAttribute("data-revealed") === "true" || element == game.activeTile) {
+    return;
+  }
+  addClickEffect(element);
+  const image = element.querySelector("img");
+  image.classList.remove("hidden");
 
-      return;
-    }
-
-    const imageToMatch = activeTile.getAttribute("data-image");
+  if (!game.activeTile) {
+    game.activeTile = element;
+  } else {
+    const imageToMatch = game.activeTile.getAttribute("data-image");
+    const imageUrl = element.getAttribute("data-image");
 
     if (imageToMatch === imageUrl) {
       element.setAttribute("data-revealed", "true");
-      activeTile.setAttribute("data-revealed", "true");
+      game.activeTile.setAttribute("data-revealed", "true");
 
-      activeTile = null;
-      awaitingEndOfMove = false;
-      revealedCount += 2;
+      game.activeTile = null;
+      game.revealedCount += 2;
 
-      // Display text + button to reset when you win
-      if (revealedCount === tileCount) {
-        const winDiv = document.querySelector('.win');
-        winDiv.innerHTML = "<h2>You Win!</h2>Refresh to play again.";
-        winDiv.style.opacity = 1;
-        const playAgainBtn = document.createElement('button');
-        playAgainBtn.textContent = "Play Again";
-        playAgainBtn.classList.add("play-again-btn");
-        winDiv.appendChild(playAgainBtn);
-        playAgainBtn.addEventListener('click', resetGame);
+      if (game.revealedCount === tileCount) {
+        handleGameWin();
       }
+    } else {
+      game.awaitingEndOfMove = true;
+      game.isComparing = true;
 
-      return;
+      setTimeout(() => {
+        image.classList.add("hidden");
+        game.activeTile.querySelector("img").classList.add("hidden");
+
+        game.awaitingEndOfMove = false;
+        game.isComparing = false;
+        game.activeTile = null;
+      }, 500);
     }
+  }
+}
 
-    awaitingEndOfMove = true;
-
-    setTimeout(() => {
-      image.classList.add("hidden");
-      activeTile.firstChild.classList.add("hidden");
-
-      awaitingEndOfMove = false;
-      activeTile = null;
-    }, 500);
-  });
-
-  return element;
+// Handle game win
+function handleGameWin() {
+  const winDiv = document.querySelector(".win");
+  winDiv.innerHTML = "<h2>You Win!</h2>Refresh to play again.";
+  winDiv.style.opacity = 1;
+  const playAgainBtn = document.createElement("button");
+  playAgainBtn.textContent = "Play Again";
+  playAgainBtn.classList.add("play-again-btn");
+  winDiv.appendChild(playAgainBtn);
+  playAgainBtn.addEventListener("click", resetGame);
 }
 
 // Reset Game
@@ -101,9 +108,10 @@ function resetGame() {
   tilesContainer.innerHTML = "";
 
   // Reset game state
-  revealedCount = 0;
-  activeTile = null;
-  awaitingEndOfMove = false;
+  game.revealedCount = 0;
+  game.activeTile = null;
+  game.awaitingEndOfMove = false;
+  game.isComparing = false;
 
   // Rebuild tiles
   imagesPicklist.push(...imageUrls);
