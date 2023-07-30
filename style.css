@@ -1,0 +1,121 @@
+body {
+  font-family: "Reem Kufi", sans-serif;
+  background: #333333;
+  margin: 0;
+}
+
+.tiles {
+  margin: 48px auto;
+  width: max-content;
+  display: grid;
+  grid-template-columns: repeat(4, 120px); /* Increase tile width to 120px */
+  grid-template-rows: repeat(4, 120px); /* Increase tile height to 120px */
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.tile {
+  width: 120px; /* Increase tile width to 120px */
+  height: 120px; /* Increase tile height to 120px */
+  background: #111111;
+  border: 5px solid #444444;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+img {
+  width:  90px; /* Set image width to 64px */
+  height: 90px; /* Set image height to 64px */
+}
+.game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.win {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.play-again-btn {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.play-again-btn:hover {
+  background-color: #45a049;
+}
+
+@keyframes clickedAnimation {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(0.9);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.tile.clicked {
+  animation: clickedAnimation 0.2s ease;
+  border-color: #ffc107;
+}
+.tile[data-revealed="true"] {
+  border-color: #ffc107; /* Add the border highlight color when data-revealed is true */
+}
+h1 {
+  color: #fff;
+  margin-bottom: 0px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.tile .hidden {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .tiles {
+    grid-template-columns: repeat(4, 80px); /* Reduce tile width to 80px */
+    grid-template-rows: repeat(4, 80px); /* Reduce tile height to 80px */
+    gap: 8px; /* Reduce gap between tiles to 8px */
+  }
+
+  .tile {
+    width: 80px; /* Reduce tile width to 80px */
+    height: 80px; /* Reduce tile height to 80px */
+  }
+
+  img {
+    width: 64px; /* Reduce image width to 64px */
+    height: 64px; /* Reduce image height to 64px */
+  }
+
+  .play-again-btn {
+    font-size: 14px;
+    margin: 20px;
+  }
+}
